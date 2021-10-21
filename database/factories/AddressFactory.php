@@ -16,10 +16,6 @@ class AddressFactory extends Factory
      * @var string
      */
     protected $model = Address::class;
-    static $collection;
-    static function getCol(){
-        static::$collection=Voucher::select('id')->get()->toArray();
-    }
 
     /**
      * Define the model's default state.
@@ -55,9 +51,9 @@ class AddressFactory extends Factory
 
             /**
              * 1. генератор сущности
-             * 2. достаем все айди
-             * 3. рандомное айди
-             * 4. рандомный тип
+             * 2. рандомный тип сущности
+             * 3. рандомное айди сущности
+             * 4. рандомный тип адреса
              * 5. если в таблице есть такое айди сущности, сущность и такой тип, генерим дальше
              */
 
@@ -68,16 +64,12 @@ class AddressFactory extends Factory
                     Invoice::class,
                     Account::class
                 ];
+                //type of entity
                 $random_type = $this->faker->randomElement($types_item);
-                $collection = $random_type::select('id')->get()->toArray();
-                $item_id = rand(0, count($collection)-1);
+                $collection_id = $random_type::inRandomOrder()->first()->id;
                 $type = $this->faker->numberBetween(1,4);
-                $result = Address::where('type_id', $type)->where('addressable_id', (int)$collection[$item_id]['id'])
+                $result = Address::where('type_id', $type)->where('addressable_id', $collection_id)
                     ->where('addressable_type', $random_type)->first();
-                echo (int)$collection[$item_id]['id'];
-                if((int)$collection[$item_id]['id']==0){
-                    print_r($collection);
-                }
                 if(is_null($result)){
                     break;
                 }
@@ -85,7 +77,7 @@ class AddressFactory extends Factory
 
             return [
                 'type_id' => $type,
-                'addressable_id' => (int)$collection[$item_id]['id'],
+                'addressable_id' => $collection_id,
                 'addressable_type' => $random_type,
             ];
         });

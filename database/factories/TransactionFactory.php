@@ -36,8 +36,7 @@ class TransactionFactory extends Factory
             $address_in_id = null;
             $address_out = $this->faker->regexify('[a-z0-4]{60}');
         }else{
-            $address_in_id = DB::table('addresses')
-                ->inRandomOrder()
+            $address_in_id = Address::inRandomOrder()
                 ->first()->id;
             $address_out = null;
         }
